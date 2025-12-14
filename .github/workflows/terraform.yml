@@ -31,6 +31,13 @@ jobs:
         with:
           terraform_version: 1.6.6
 
+      - name: Debug ARM environment variables
+        run: |
+          echo "ARM_CLIENT_ID is set -> ${ARM_CLIENT_ID:+YES}"
+          echo "ARM_CLIENT_SECRET is set -> ${ARM_CLIENT_SECRET:+YES}"
+          echo "ARM_SUBSCRIPTION_ID is set -> ${ARM_SUBSCRIPTION_ID:+YES}"
+          echo "ARM_TENANT_ID is set -> ${ARM_TENANT_ID:+YES}"
+
       - name: Terraform Init
         run: |
           cd terraform/environments/${{ github.event.inputs.environment }}
@@ -44,16 +51,10 @@ jobs:
       - name: Terraform Plan
         run: |
           cd terraform/environments/${{ github.event.inputs.environment }}
-          terraform plan \
-            -input=false \
-            -lock-timeout=5m \
-            -out=tfplan
+          terraform plan -input=false -lock-timeout=5m -out=tfplan
 
       - name: Terraform Apply
         run: |
           cd terraform/environments/${{ github.event.inputs.environment }}
-          terraform apply \
-            -auto-approve \
-            -input=false \
-            tfplan
+          terraform apply -auto-approve -input=false tfplan
 
