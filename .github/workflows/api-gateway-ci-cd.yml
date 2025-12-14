@@ -1,0 +1,41 @@
+name: Build & Deploy API Gateway
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - services/api-gateway/**
+      - k8s-manifests/base/services/api-gateway/**
+
+jobs:
+  api-gateway-ci-cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------- BUILD ----------
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Build & Push Image
+        run: |
+          IMAGE=${{ secrets.ACR_LOGIN_SERVER }}/api-gateway:${{ github.sha }}
+          docker build -t $IMAGE services/api-gateway
+          docker push $IMAGE
+
+      # ---------- CD ----------
+      - uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+
+      - name: Deploy API Gateway
+        run: |
+          kubectl set image deployment/api-gateway \
+            api-gateway=${{ secrets.ACR_LOGIN_SERVER }}/api-gateway:${{ github.sha }} \
+            -n devops-demo
+

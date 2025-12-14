@@ -1,0 +1,52 @@
+name: Build & Deploy Order Service
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - services/order-service/**
+      - k8s-manifests/base/services/order/**
+
+jobs:
+  order-ci-cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------- CI ----------
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run unit tests
+        run: |
+          cd services/order-service
+          pip install -r requirements.txt
+          pytest
+
+      # ---------- BUILD ----------
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Build & Push Image
+        run: |
+          IMAGE=${{ secrets.ACR_LOGIN_SERVER }}/order-service:${{ github.sha }}
+          docker build -t $IMAGE services/order-service
+          docker push $IMAGE
+
+      # ---------- CD ----------
+      - uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+
+      - name: Deploy Order Service
+        run: |
+          kubectl set image deployment/order-service \
+            order-service=${{ secrets.ACR_LOGIN_SERVER }}/order-service:${{ github.sha }} \
+            -n devops-demo
+
