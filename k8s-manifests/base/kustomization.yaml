@@ -1,0 +1,9 @@
+resources:
+  - namespace.yaml
+  - common/configmap.yaml
+  - common/secret.yaml
+  - common/hpa.yaml
+  - services/user
+  - services/order
+  - services/api-gateway
+
