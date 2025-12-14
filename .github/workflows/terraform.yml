@@ -8,6 +8,10 @@ on:
         required: true
         default: "dev"
 
+concurrency:
+  group: terraform-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   terraform:
     name: Terraform Apply
@@ -30,13 +34,6 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
-
-      - name: Debug ARM environment variables
-        run: |
-          echo "ARM_CLIENT_ID is set -> ${ARM_CLIENT_ID:+YES}"
-          echo "ARM_CLIENT_SECRET is set -> ${ARM_CLIENT_SECRET:+YES}"
-          echo "ARM_SUBSCRIPTION_ID is set -> ${ARM_SUBSCRIPTION_ID:+YES}"
-          echo "ARM_TENANT_ID is set -> ${ARM_TENANT_ID:+YES}"
 
       - name: Terraform Init
         run: |
