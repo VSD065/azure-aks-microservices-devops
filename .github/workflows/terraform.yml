@@ -26,6 +26,21 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
+      TF_VAR_environment: ${{ vars.TF_VAR_ENVIRONMENT }}
+      TF_VAR_location: ${{ vars.TF_VAR_LOCATION }}
+      TF_VAR_name_prefix: ${{ vars.TF_VAR_NAME_PREFIX }}
+      TF_VAR_vnet_cidr: ${{ vars.TF_VAR_VNET_CIDR }}
+      TF_VAR_public_subnet_cidr: ${{ vars.TF_VAR_PUBLIC_SUBNET_CIDR }}
+      TF_VAR_private_subnet_cidr: ${{ vars.TF_VAR_PRIVATE_SUBNET_CIDR }}
+      TF_VAR_kubernetes_version: ${{ vars.TF_VAR_KUBERNETES_VERSION }}
+      TF_VAR_aks_node_count: ${{ vars.TF_VAR_AKS_NODE_COUNT }}
+      TF_VAR_aks_node_vm_size: ${{ vars.TF_VAR_AKS_NODE_VM_SIZE }}
+      TF_VAR_acr_name: ${{ vars.TF_VAR_ACR_NAME }}
+      TF_VAR_aks_cluster_name: ${{ vars.TF_VAR_AKS_CLUSTER_NAME }}
+      TF_VAR_key_vault_name: ${{ vars.TF_VAR_KEY_VAULT_NAME }}
+      TF_VAR_enable_log_analytics: ${{ vars.TF_VAR_ENABLE_LOG_ANALYTICS }}
+      TF_VAR_enable_app_insights: ${{ vars.TF_VAR_ENABLE_APP_INSIGHTS }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
