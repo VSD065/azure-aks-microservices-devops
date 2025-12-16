@@ -7,15 +7,15 @@ resource "azurerm_kubernetes_cluster" "this" {
   kubernetes_version = trimspace(var.kubernetes_version)
 
   default_node_pool {
-    name           = "default"
-    node_count     = var.node_count
-    vm_size        = var.node_vm_size
-    vnet_subnet_id = var.subnet_id
+  name           = "default"
+  node_count     = var.node_count
+  vm_size        = var.node_vm_size
+  vnet_subnet_id = var.subnet_id
 
-    upgrade_settings {
-      max_surge = "0"
-    }
+  upgrade_settings {
+    max_surge = "1"
   }
+}
 
   identity {
     type = "SystemAssigned"
