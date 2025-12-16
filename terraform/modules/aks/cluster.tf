@@ -7,11 +7,18 @@ resource "azurerm_kubernetes_cluster" "this" {
   kubernetes_version  = trimspace(var.kubernetes_version)
 
   default_node_pool {
-    name       = "default"
-    node_count = var.node_count
-    vm_size    = var.node_vm_size
+    name           = "default"
+    node_count     = var.node_count
+    vm_size        = var.node_vm_size
     vnet_subnet_id = var.subnet_id
   }
+
+  network_profile {
+  network_plugin = "azure"
+  service_cidr   = var.service_cidr
+  dns_service_ip = var.dns_service_ip
+  }
+
 
   identity {
     type = "SystemAssigned"
