@@ -40,6 +40,9 @@ jobs:
       TF_VAR_key_vault_name: ${{ vars.TF_VAR_KEY_VAULT_NAME }}
       TF_VAR_enable_log_analytics: ${{ vars.TF_VAR_ENABLE_LOG_ANALYTICS }}
       TF_VAR_enable_app_insights: ${{ vars.TF_VAR_ENABLE_APP_INSIGHTS }}
+      
+      TF_VAR_service_cidr: ${{ vars.TF_VAR_SERVICE_CIDR }}
+      TF_VAR_dns_service_ip: ${{ vars.TF_VAR_DNS_SERVICE_IP }}
 
     steps:
       - name: Checkout repository
