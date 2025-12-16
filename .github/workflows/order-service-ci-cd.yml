@@ -34,19 +34,13 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to ACR
-        run: |
-          az acr login --name ${{ vars.TF_VAR_ACR_NAME }}
+        run: az acr login --name ${{ secrets.ACR_NAME }}
 
       - name: Build & Push Image
         run: |
-          IMAGE=${{ vars.TF_VAR_ACR_LOGIN_SERVER }}/order-service:${{ github.sha }}
+          IMAGE=${{ secrets.ACR_LOGIN_SERVER }}/order-service:${{ github.sha }}
           docker build -t $IMAGE services/order-service
           docker push $IMAGE
-
-      - name: Debug AKS vars
-        run: |
-          echo "RG=${{ vars.AKS_RESOURCE_GROUP }}"
-          echo "CLUSTER=${{ vars.AKS_CLUSTER_NAME }}"
 
       - name: Set AKS Context
         uses: azure/aks-set-context@v3
@@ -60,13 +54,9 @@ jobs:
 
       - name: Deploy Order Service
         run: |
-          if kubectl get deployment order-service -n devops-demo; then
-            kubectl set image deployment/order-service \
-              order-service=${{ vars.TF_VAR_ACR_LOGIN_SERVER }}/order-service:${{ github.sha }} \
-              -n devops-demo
-          else
-            kubectl apply -f k8s-manifests/base/services/order/ -n devops-demo
-          fi
+          kubectl set image deployment/order-service \
+            order-service=${{ secrets.ACR_LOGIN_SERVER }}/order-service:${{ github.sha }} \
+            -n devops-demo
 
       - name: Verify rollout
         run: |
