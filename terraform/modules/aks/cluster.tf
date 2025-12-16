@@ -13,8 +13,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   vnet_subnet_id = var.subnet_id
 
   upgrade_settings {
-    max_surge = "0"
-  }
+  max_unavailable = 1
 }
 
 
