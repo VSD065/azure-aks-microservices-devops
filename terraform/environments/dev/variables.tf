@@ -24,3 +24,6 @@ variable "enable_app_insights" {
   default = true
 }
 
+variable "service_cidr" {}
+variable "dns_service_ip" {}
+

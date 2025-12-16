@@ -44,6 +44,9 @@ module "aks" {
   subnet_id        = module.network.private_subnet_id
   acr_id           = module.acr.acr_id
   log_analytics_id = module.monitoring.log_analytics_id
+
+  service_cidr          = var.service_cidr
+  dns_service_ip        = var.dns_service_ip
 }
 
 

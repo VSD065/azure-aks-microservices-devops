@@ -38,3 +38,13 @@ variable "resource_group_name" {
   type = string
 }
 
+variable "service_cidr" {
+  description = "AKS service CIDR"
+  type        = string
+}
+
+variable "dns_service_ip" {
+  description = "AKS DNS service IP"
+  type        = string
+}
+
