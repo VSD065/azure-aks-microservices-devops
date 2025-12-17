@@ -37,6 +37,8 @@ jobs:
       TF_VAR_vnet_cidr: ${{ vars.TF_VAR_VNET_CIDR }}
       TF_VAR_public_subnet_cidr: ${{ vars.TF_VAR_PUBLIC_SUBNET_CIDR }}
       TF_VAR_private_subnet_cidr: ${{ vars.TF_VAR_PRIVATE_SUBNET_CIDR }}
+      TF_VAR_service_cidr: ${{ vars.TF_VAR_SERVICE_CIDR }}
+      TF_VAR_dns_service_ip: ${{ vars.TF_VAR_DNS_SERVICE_IP }}
       TF_VAR_kubernetes_version: ${{ vars.TF_VAR_KUBERNETES_VERSION }}
       TF_VAR_aks_node_count: ${{ vars.TF_VAR_AKS_NODE_COUNT }}
       TF_VAR_aks_node_vm_size: ${{ vars.TF_VAR_AKS_NODE_VM_SIZE }}
