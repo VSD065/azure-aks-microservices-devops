@@ -13,6 +13,7 @@ jobs:
 
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -53,6 +54,10 @@ jobs:
           kubectl get ns devops-demo || kubectl create ns devops-demo
 
       - name: Deploy Order Service
+        run: |
+          kubectl apply -f k8s-manifests/base/services/order/ -n devops-demo
+
+      - name: Update image
         run: |
           kubectl set image deployment/order-service \
             order-service=${{ secrets.ACR_LOGIN_SERVER }}/order-service:${{ github.sha }} \
