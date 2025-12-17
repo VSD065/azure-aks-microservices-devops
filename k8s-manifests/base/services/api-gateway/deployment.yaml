@@ -4,7 +4,7 @@ metadata:
   name: api-gateway
   namespace: devops-demo
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: api-gateway:latest
-          imagePullPolicy: IfNotPresent
+          image: azureassignmentacr.azurecr.io/api-gateway
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
           env:
