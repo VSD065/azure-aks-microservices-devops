@@ -55,7 +55,7 @@ jobs:
 
       - name: Deploy Order Service
         run: |
-          kubectl apply -f k8s-manifests/base/services/order/ -n devops-demo
+          kubectl apply -k k8s-manifests/base/services/order -n devops-demo
 
       - name: Update image
         run: |
