@@ -4,21 +4,18 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Environment to destroy (dev/prod)"
+        description: "Environment to destroy"
         required: true
         default: "dev"
       confirm:
         description: "Type DESTROY to confirm"
         required: true
 
-concurrency:
-  group: terraform-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   terraform-destroy:
     name: Terraform Destroy
     runs-on: ubuntu-latest
+    environment: dev
 
     if: github.event.inputs.confirm == 'DESTROY'
 
@@ -56,10 +53,10 @@ jobs:
           terraform_version: 1.6.6
 
       - run: |
-          cd terraform/environments/${{ github.event.inputs.environment }}
+          cd terraform/environments/dev
           terraform init -input=false
 
       - run: |
-          cd terraform/environments/${{ github.event.inputs.environment }}
+          cd terraform/environments/dev
           terraform destroy -auto-approve -input=false
 
