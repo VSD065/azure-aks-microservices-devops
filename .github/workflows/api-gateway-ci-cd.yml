@@ -11,15 +11,20 @@ jobs:
   api-gateway-ci-cd:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
-      # ---------- BUILD ----------
-      - uses: azure/login@v2
+      - name: Azure Login
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - run: az acr login --name ${{ secrets.ACR_NAME }}
+      - name: Login to ACR
+        run: az acr login --name ${{ secrets.ACR_NAME }}
 
       - name: Build & Push Image
         run: |
@@ -27,15 +32,27 @@ jobs:
           docker build -t $IMAGE services/api-gateway
           docker push $IMAGE
 
-      # ---------- CD ----------
-      - uses: azure/aks-set-context@v3
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v3
         with:
           resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
 
+      - name: Ensure namespace exists
+        run: |
+          kubectl get ns devops-demo || kubectl create ns devops-demo
+
       - name: Deploy API Gateway
+        run: |
+          kubectl apply -k k8s-manifests/base/services/api-gateway -n devops-demo
+
+      - name: Update image
         run: |
           kubectl set image deployment/api-gateway \
             api-gateway=${{ secrets.ACR_LOGIN_SERVER }}/api-gateway:${{ github.sha }} \
             -n devops-demo
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/api-gateway -n devops-demo
 
