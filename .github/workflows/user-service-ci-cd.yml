@@ -11,13 +11,14 @@ jobs:
   user-ci-cd:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    permissions:
+      contents: read
+      id-token: write
 
-      # ---------- CI ----------
-      - name: Set up Python
-        uses: actions/setup-python@v5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -25,9 +26,9 @@ jobs:
         run: |
           cd services/user-service
           pip install -r requirements.txt
+          export PYTHONPATH=$(pwd)
           pytest
 
-      # ---------- BUILD ----------
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -36,22 +37,33 @@ jobs:
       - name: Login to ACR
         run: az acr login --name ${{ secrets.ACR_NAME }}
 
-      - name: Build & Push Docker Image
+      - name: Build & Push Image
         run: |
           IMAGE=${{ secrets.ACR_LOGIN_SERVER }}/user-service:${{ github.sha }}
           docker build -t $IMAGE services/user-service
           docker push $IMAGE
 
-      # ---------- CD ----------
       - name: Set AKS Context
         uses: azure/aks-set-context@v3
         with:
           resource-group: ${{ secrets.AKS_RESOURCE_GROUP }}
           cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
 
+      - name: Ensure namespace exists
+        run: |
+          kubectl get ns devops-demo || kubectl create ns devops-demo
+
       - name: Deploy User Service
+        run: |
+          kubectl apply -k k8s-manifests/base/services/user -n devops-demo
+
+      - name: Update image
         run: |
           kubectl set image deployment/user-service \
             user-service=${{ secrets.ACR_LOGIN_SERVER }}/user-service:${{ github.sha }} \
             -n devops-demo
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/user-service -n devops-demo
 
